@@ -15,7 +15,7 @@ public:
 
 		switch (Char)
 		{
-		
+
 
 		case '$':
 		case '-':
@@ -23,7 +23,7 @@ public:
 		case '&':
 			return { SymbolType::safe, std::string{ Char } };
 
-			
+
 		case '!':
 		case '*':
 		case '"':
@@ -32,9 +32,9 @@ public:
 		case ')':
 		case ';':
 		case ',':
-		//: and . are used elsewhere as well
+			//: and . are used elsewhere as well
 		case ' ':
-		
+
 			return { SymbolType::extra, std::string{ Char } };
 
 		case '/':
@@ -44,7 +44,7 @@ public:
 			char nextChar = m_scanner.PeekNextChar();
 
 
-			
+
 			if (nextChar == '/')
 			{
 				nextChar = m_scanner.GetNextChar();
@@ -59,54 +59,106 @@ public:
 			return { SymbolType::plus, std::string{Char} };
 		case ':':
 			return { SymbolType::colon,  std::string{Char} };
-		case '@' :
+		case '@':
 			return { SymbolType::at,  std::string{Char} };
 		case '.':
 			return { SymbolType::dot,  std::string{Char} };
-		case '\\':
+		case '\0':
+			return { SymbolType::eof,  std::string{} };
+		case '%':
 		{
+			Token escape{ SymbolType::escape, std::string{Char} };
+
+			char nextChar = m_scanner.PeekNextChar();
+
+			auto isHexDigit = [](char c) {
+				return (c >= '0' && c <= '9') ||
+					(c >= 'a' && c <= 'f') ||
+					(c >= 'A' && c <= 'F');
+				};
+			if (!isHexDigit(nextChar))
+			{
+				return { SymbolType::unknown,  escape.value };
+			}
+
+			
+			escape.value.push_back(m_scanner.GetNextChar());
+
+			
+
+			nextChar = m_scanner.PeekNextChar();
+
+			if (!isHexDigit(nextChar))
+			{
+				return { SymbolType::unknown,  escape.value };
+			}
+
+			escape.value.push_back(m_scanner.GetNextChar());
+			return escape;
+			
 
 		}
 
-
 		default:
 
-			if (Char >= '0' && Char <= '9')
+			auto isAlpha = [](char c) {
+				return (c >= 'a' && c <= 'z') ||
+					(c >= 'A' && c <= 'Z');
+				};
+
+			auto isDigit = [](char c) {
+				return (c >= '0' && c <= '9');
+				};
+
+			if (isDigit(Char))
 			{
 				Token digits{ SymbolType::digits,std::string{Char} };
-				
+
 				while (true)
 				{
 					char nextChar = m_scanner.PeekNextChar();
-					if (nextChar >= '0' && nextChar <= '9')
+					if (isDigit(nextChar))
 					{
-						digits.value.push_back(m_scanner.GetNextChar()); 
+						digits.value.push_back(m_scanner.GetNextChar());
 					}
 					else
 					{
-						break; 
+						break;
 					}
 				}
 
 				return digits;
 			}
 
-			if (Char > 'a' && Char < 'z' || Char>'A' && Char < 'Z')
+			if (isAlpha(Char))
 			{
 				Token text{ SymbolType::text, std::string{Char} };
 
-				while()
+				while (true)
+				{
+					char nextChar = m_scanner.PeekNextChar();
+					if (isAlpha(nextChar))
+					{
+						text.value.push_back(m_scanner.GetNextChar());
+					}
+					else
+					{
+						break;
+					}
+				}
+
+				return text;
 
 			}
 
 
 
-			return { SymbolType::unknown,  std::string{Char} }; //SSO avoids heap alloc
+			return { SymbolType::unknown,  std::string{Char} };
 		}
 	}
 
-private:
-	Scanner m_scanner;
-
+	private:
+		Scanner m_scanner;
+	
 };
 
