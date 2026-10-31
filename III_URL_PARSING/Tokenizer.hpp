@@ -5,7 +5,11 @@ class Tokenizer
 {
 public:
 
+	Tokenizer(std::istream& input)
+		:m_scanner(input)
+	{
 
+	}
 
 	Token GetNextToken()
 	{
@@ -44,7 +48,6 @@ public:
 			char nextChar = m_scanner.PeekNextChar();
 
 
-
 			if (nextChar == '/')
 			{
 				nextChar = m_scanner.GetNextChar();
@@ -64,7 +67,7 @@ public:
 		case '.':
 			return { SymbolType::dot,  std::string{Char} };
 		case '\0':
-			return { SymbolType::eof,  std::string{} };
+			return { SymbolType::epsilon,  std::string{} };
 		case '%':
 		{
 			Token escape{ SymbolType::escape, std::string{Char} };
@@ -81,10 +84,10 @@ public:
 				return { SymbolType::unknown,  escape.value };
 			}
 
-			
+
 			escape.value.push_back(m_scanner.GetNextChar());
 
-			
+
 
 			nextChar = m_scanner.PeekNextChar();
 
@@ -95,7 +98,7 @@ public:
 
 			escape.value.push_back(m_scanner.GetNextChar());
 			return escape;
-			
+
 
 		}
 
@@ -147,18 +150,26 @@ public:
 					}
 				}
 
+				if (text.value == "http")
+				{
+					return Token{ SymbolType::http, text.value };
+				}
+
+				if (text.value == "ftp")
+				{
+					return Token{ SymbolType::ftp, text.value };
+				}
+
+
 				return text;
 
 			}
-
 
 
 			return { SymbolType::unknown,  std::string{Char} };
 		}
 	}
 
-	private:
-		Scanner m_scanner;
-	
+private:
+	Scanner m_scanner;
 };
-
