@@ -149,7 +149,7 @@ private:
 			return std::unexpected{ "Ialpha: Unexpected token: \'" + m_currentToken.value + "\'" };
 		}
 
-		std::weak_ordering Xalphas();
+		std::ignore = Xalphas();
 
 		return {};
 	}
