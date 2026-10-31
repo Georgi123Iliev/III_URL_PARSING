@@ -19,13 +19,13 @@ enum class SymbolType
 	digits,
 	text,
 	unknown,
-	eof
+	epsilon
 };
 
 struct Token
 {
 	SymbolType symbolType;
-	std::string value; //обхваща всички нужди - няма смисъл от съхраняване на като число на digits
+	std::string value; //обхваща всички нужди  - няма смисъл от съхраняване на като число на digits
 
 	Token(SymbolType symbolType, const std::string& value)
 		: symbolType(symbolType), value(value)

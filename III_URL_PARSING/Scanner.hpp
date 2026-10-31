@@ -6,7 +6,7 @@ class Scanner
 	std::istream& m_stream;
 
 public:
-	Scanner(std::istream& stream = std::cin)
+	Scanner(std::istream& stream)
 	:	m_stream(stream)
 	{
 
@@ -19,6 +19,11 @@ public:
 		char Char;
 
 		if (!m_stream.get(Char)) {
+			Char = '\0';
+		}
+
+		if(Char == '\n')
+		{
 			Char = '\0';
 		}
 
